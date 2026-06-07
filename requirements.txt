@@ -1,4 +1,11 @@
-ultralytics>=8.0.0
+fastapi
+uvicorn
+python-multipart
+
+ultralytics
 torch
 torchvision
+
+opencv-python-headless
+
 kaggle
