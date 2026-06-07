@@ -30,6 +30,11 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 app.mount("/outputs", StaticFiles(directory=OUTPUT_DIR), name="outputs")
 
 
+@app.get("/")
+def health_check():
+    return {"status": "ok", "message": "Car Damage API is running"}
+
+
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
     suffix = os.path.splitext(file.filename or "")[1] or ".jpg"
