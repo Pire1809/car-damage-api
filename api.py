@@ -14,6 +14,8 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",
         "http://127.0.0.1:3000",
+        "https://car-damage-web.vercel.app",
+        "https://car-damage-eg5p6iv3i-alfredo-reyes-projects1809.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],
