@@ -144,6 +144,17 @@ def get_detection_count_multiplier(count: int) -> float:
     return 1.50
 
 
+def translate_severity_to_spanish(severity: str) -> str:
+    translations = {
+        "None": "Ninguna",
+        "Low": "Baja",
+        "Moderate": "Moderada",
+        "High": "Alta",
+    }
+
+    return translations.get(severity, severity)
+
+
 def calculate_repair_estimate(
     detections: list[dict],
     make: str,
@@ -156,8 +167,18 @@ def calculate_repair_estimate(
             "max": 0,
             "currency": "USD",
             "severity": "None",
-            "summary": "No visible vehicle damage was detected.",
-            "disclaimer": "This is an AI-generated preliminary estimate and not an official repair quote.",
+            "summary": {
+                "en": "No visible vehicle damage was detected.",
+                "es": "No se detectó daño visible en el vehículo.",
+            },
+            "disclaimer": {
+                "en": (
+                    "This is an AI-generated preliminary estimate and not an official repair quote."
+                ),
+                "es": (
+                    "Este es un estimado preliminar generado por IA y no representa una cotización oficial de reparación."
+                ),
+            },
         }
 
     base_min = 0
@@ -218,9 +239,12 @@ def calculate_repair_estimate(
     else:
         overall_severity = "Low"
 
+    final_min_rounded = round(final_min)
+    final_max_rounded = round(final_max)
+
     return {
-        "min": round(final_min),
-        "max": round(final_max),
+        "min": final_min_rounded,
+        "max": final_max_rounded,
         "currency": "USD",
         "severity": overall_severity,
         "multipliers": {
@@ -229,16 +253,30 @@ def calculate_repair_estimate(
             "year": year_multiplier,
             "damage_count": count_multiplier,
         },
-        "summary": (
-            f"The system detected {len(detections)} possible damage area(s). "
-            f"The estimated severity is {overall_severity}. "
-            f"The estimated repair range is ${round(final_min):,} - ${round(final_max):,} USD."
-        ),
-        "disclaimer": (
-            "This is an AI-generated preliminary estimate and not an official repair quote. "
-            "Final repair cost may vary by location, labor rate, parts availability, paint matching, "
-            "hidden damage, calibration needs, and repair shop pricing."
-        ),
+        "summary": {
+            "en": (
+                f"The system detected {len(detections)} possible damage area(s). "
+                f"The estimated severity is {overall_severity}. "
+                f"The estimated repair range is ${final_min_rounded:,} - ${final_max_rounded:,} USD."
+            ),
+            "es": (
+                f"El sistema detectó {len(detections)} posible(s) área(s) de daño. "
+                f"La severidad estimada es {translate_severity_to_spanish(overall_severity)}. "
+                f"El rango estimado de reparación es de ${final_min_rounded:,} a ${final_max_rounded:,} USD."
+            ),
+        },
+        "disclaimer": {
+            "en": (
+                "This is an AI-generated preliminary estimate and not an official repair quote. "
+                "Final repair cost may vary by location, labor rate, parts availability, paint matching, "
+                "hidden damage, calibration needs, and repair shop pricing."
+            ),
+            "es": (
+                "Este es un estimado preliminar generado por IA y no representa una cotización oficial de reparación. "
+                "El costo final puede variar según la ubicación, tarifa de mano de obra, disponibilidad de piezas, "
+                "igualación de pintura, daños ocultos, necesidad de calibración y precios del taller."
+            ),
+        },
     }
 
 
