@@ -6,6 +6,7 @@ import tempfile
 import uuid
 import os
 import cv2
+import requests
 from datetime import datetime
 
 app = FastAPI()
@@ -23,7 +24,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-model = YOLO("models_trained/A/best.pt")
+MODEL_PATH = "models_trained/A/best.pt"
+MODEL_URL = os.getenv("MODEL_URL")
+
+os.makedirs("models_trained/A", exist_ok=True)
+
+if MODEL_URL:
+    print("Downloading model from Azure Blob Storage...")
+    response = requests.get(MODEL_URL, timeout=300)
+    response.raise_for_status()
+
+    with open(MODEL_PATH, "wb") as f:
+        f.write(response.content)
+
+    print("Model downloaded successfully.")
+
+model = YOLO(MODEL_PATH)
 
 OUTPUT_DIR = "outputs"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
